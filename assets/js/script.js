@@ -45,19 +45,25 @@ var saveTasks = function() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 };
 
+
+// task text was clicked
 $(".list-group").on("click", "p", function() {
+	// get current text of p element
 	var text = $(this)
 	.text()
 	.trim();
 	
+	// replace p element with a new textarea
 	var textInput = $("<textarea>")
 			.addClass("form-control")
 			.val(text);
-			
 	$(this).replaceWith(textInput);
+	
+	// auto focus new element
 	textInput.trigger("focus");
 });
 
+// editable field was un focused
 $(".list-group").on("blur", "textarea", function() {
 	// get the textarea's current value/text
 	var text = $(this)
@@ -84,8 +90,7 @@ $(".list-group").on("blur", "textarea", function() {
 		.text(text);
 		
 	// replace textarea with p element
-	$(this).replaceWith(taskP);
-		
+	$(this).replaceWith(taskP);		
 }); 
 
 // due date was clicked
@@ -99,12 +104,11 @@ $(".list-group").on("click", "span", function() {
 	var dateInput = $("<input>")
 		.attr("type", "text")
 		.addClass("form-control")
-		.val(date);
-		
+		.val(date);		
 	// swap out elements
 	$(this).replaceWith(dateInput);
 	
-	// automatically focus on new element
+	// automatically focus on new element. bring up calendar
 	dateInput.trigger("focus");
 });
 
@@ -134,7 +138,6 @@ $(".list-group").on("blur", "input[type='text']", function() {
 	var taskSpan = $("<span>")
 		.addClass("badge badge-primary badge-pill")
 		.text(date);
-		
 	// replace input with span element
 	$(this).replaceWith(taskSpan);
 });
