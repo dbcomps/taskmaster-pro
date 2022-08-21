@@ -81,22 +81,18 @@ $(".card .list-group").sortable({
   activate: function(event, ui) {
   	$(this).addClass("dropover");
   	$(".bottom-trash").addClass("bottom-trash-drag");
-  	console.log("activate", this);
   },
   deactivate: function(event, ui) {
   	$(this).removeClass("dropover");
   	$(".bottom-trash").removeClass("bottom-trash-drag");
-  	console.log("deactivate", this);
   },
   over: function(event) {
   	$(event.target).addClass("dropover-active");
   	$(".bottom-trash").addClass("bottom-trash-active");
-  	console.log("over", event.target);
   },
   out: function(event) {
   	$(event.target).removeClass("dropover-active");
   	$(".bottom-trash").removeClass("bottom-trash-active");
-  	console.log("out", event.target);
   },
   update: function(event) {
 	// array to store the task data index
@@ -129,8 +125,6 @@ $(".card .list-group").sortable({
   	// update array on tasks object and saveTasks
   	tasks[arrName] = tempArr;
   	saveTasks();
-  	
-  	console.log(tempArr);
 	},
 	stop: function(even) {
 		$(this).removeClass("dropover");
@@ -153,8 +147,44 @@ $("#trash").droppable({
 	}
 });
 
+// convert text field into a jquery date picker
 $("#modalDueDate").datepicker({
+	// force user to select a future date
 	minDate: 1
+});
+
+// modal was triggered
+$("#task-form-modal").on("show.bs.modal", function() {
+  // clear values
+  $("#modalTaskDescription, #modalDueDate").val("");
+});
+
+// modal is fully visible
+$("#task-form-modal").on("shown.bs.modal", function() {
+  // highlight textarea
+  $("#modalTaskDescription").trigger("focus");
+});
+
+// save button in modal was clicked
+$("#task-form-modal .btn-save").click(function() {
+  // get form values
+  var taskText = $("#modalTaskDescription").val();
+  var taskDate = $("#modalDueDate").val();
+
+  if (taskText && taskDate) {
+    createTask(taskText, taskDate, "toDo");
+
+    // close modal
+    $("#task-form-modal").modal("hide");
+
+    // save in tasks array
+    tasks.toDo.push({
+      text: taskText,
+      date: taskDate
+    });
+
+    saveTasks();
+  }
 });
 
 // task text was clicked
@@ -191,7 +221,8 @@ $(".list-group").on("blur", "textarea", function() {
 	var index = $(this)
 		.closest(".list-group-item")
 		.index();
-		
+	
+	// update task in array and re-save to localStorage
 	tasks[status][index].text = text;
 	saveTasks();
 	
@@ -260,48 +291,9 @@ $(".list-group").on("change", "input[type='text']", function() {
 		.text(date);
 	// replace input with span element
 	$(this).replaceWith(taskSpan);
-	
 	// pass task's <li> element into auditTask() to check new due date
 	auditTask($(taskSpan).closest(".list-group-item"));
 });
-
-
-
-// modal was triggered
-$("#task-form-modal").on("show.bs.modal", function() {
-  // clear values
-  $("#modalTaskDescription, #modalDueDate").val("");
-});
-
-// modal is fully visible
-$("#task-form-modal").on("shown.bs.modal", function() {
-  // highlight textarea
-  $("#modalTaskDescription").trigger("focus");
-});
-
-// save button in modal was clicked
-$("#task-form-modal .btn-save").click(function() {
-  // get form values
-  var taskText = $("#modalTaskDescription").val();
-  var taskDate = $("#modalDueDate").val();
-
-  if (taskText && taskDate) {
-    createTask(taskText, taskDate, "toDo");
-
-    // close modal
-    $("#task-form-modal").modal("hide");
-
-    // save in tasks array
-    tasks.toDo.push({
-      text: taskText,
-      date: taskDate
-    });
-
-    saveTasks();
-  }
-});
-
-
 
 // remove all tasks
 $("#remove-tasks").on("click", function() {
@@ -309,6 +301,7 @@ $("#remove-tasks").on("click", function() {
     tasks[key].length = 0;
     $("#list-" + key).empty();
   }
+  console.log(tasks);
   saveTasks();
 });
 
